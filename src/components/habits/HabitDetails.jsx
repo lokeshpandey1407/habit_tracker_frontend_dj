@@ -4,11 +4,24 @@ import axios from "axios";
 import Loader from "../loader/Loader";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const HabitPage = () => {
   const { id } = useParams();
   const [habit, setHabit] = useState(null);
   const [habitUpdateModal, setHabitUpdateModal] = useState(false);
+  const [barData, setBarData] = useState([]);
+  const [habitUpdating, setHabitUpdating] = useState(false);
+  const [progressUpdating, setProgressUpdating] = useState(false);
   const [progressUpdateModal, setProgressUpdateModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -22,13 +35,31 @@ const HabitPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setHabit(response.data.data);
+      if (response.data.success) {
+        const chartData = configureChartData(response?.data?.data?.progress);
+        setHabit(response.data.data);
+        setBarData(chartData);
+      }
     } catch (error) {
       console.error("Error fetching habit:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  const configureChartData = (data) => {
+    let chartData = data.map((item) => {
+      return {
+        date: new Date(item.date).toLocaleDateString("en-Us"),
+        count: item.count,
+      };
+    });
+    chartData = chartData.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    return chartData;
+  };
+
   useEffect(() => {
     fetchHabit();
   }, [id]);
@@ -50,7 +81,6 @@ const HabitPage = () => {
   };
 
   const getBackgroundColor = (progress, goal) => {
-    console.log(progress, goal);
     const goalCompletionPercentage = (progress / goal) * 100;
     return `linear-gradient(to right, #48BB78 ${goalCompletionPercentage}%, #E2E8F0 ${goalCompletionPercentage}%)`;
   };
@@ -108,6 +138,7 @@ const HabitPage = () => {
   };
 
   async function handleUpdateHabit(e) {
+    setHabitUpdating(true);
     e.preventDefault();
     const token = JSON.parse(localStorage.getItem("authToken"));
     const formData = new FormData(e.target);
@@ -133,10 +164,13 @@ const HabitPage = () => {
     } catch (error) {
       toast.error("Unable to update habit");
       console.log(error);
+    } finally {
+      setHabitUpdating(false);
     }
   }
 
   async function handleUpdateProgress(e) {
+    setProgressUpdateModal(true);
     e.preventDefault();
     const token = JSON.parse(localStorage.getItem("authToken"));
     const formData = new FormData(e.target);
@@ -151,30 +185,43 @@ const HabitPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(response);
       if (response.data.success) {
         setHabit(response.data.data);
+        const chartData = configureChartData(response?.data?.data?.progress);
+        console.log(chartData);
+        setBarData(chartData);
         closeProgresssUpdaetModal();
         toast.success("Habit progresss updated successfully.");
       }
     } catch (error) {
       toast.error("Unable to update habit progress");
       console.log(error);
+    } finally {
+      setProgressUpdateModal(false);
     }
   }
 
   if (loading) return <Loader />;
+
   return (
     <div className="container mx-auto p-2">
+      <button
+        className="bg-red-500 px-2 py-1  rounded-md"
+        onClick={() => navigate(-1)}
+      >
+        <Icon icon="ep:back" width="24" height="24" />
+      </button>
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
         {/* Habit Title and Description */}
         <div className="mb-4 flex flex-row justify-between items-center">
           <div>
             <h1 className="text-xl font-semibold text-gray-800">
-              {habit.title}
+              {habit?.title}
             </h1>
-            {habit.description && (
-              <p className="text-gray-600 text-md mt-2">{habit.description}</p>
+            {habit?.description && (
+              <p className="text-gray-600 text-md mt-2">
+                {habit?.description || ""}
+              </p>
             )}
           </div>
           <button
@@ -189,7 +236,7 @@ const HabitPage = () => {
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-700">Goal</h2>
           <p className="text-gray-600">
-            {habit.habitGoal.count} {habit.habitGoal.unit}
+            {habit?.habitGoal?.count || ""} {habit?.habitGoal?.unit || ""}
           </p>
         </div>
 
@@ -204,35 +251,39 @@ const HabitPage = () => {
               Add/Update Progresss
             </button>
           </div>
-          <ul className="space-y-4">
-            {habit.progress.map((item, index) => (
-              <li
-                key={index}
-                className="py-2 border rounded-md border-gray-300 p-2 mt-2"
-              >
-                <span className="font-medium text-gray-800">
-                  {new Date(item.date).toLocaleDateString("en-Us", {
-                    dateStyle: "medium",
-                  })}
-                </span>
-                <div
-                  className="flex items-center justify-between p-1 "
-                  style={{
-                    background: getBackgroundColor(
-                      item.count,
-                      habit.habitGoal.count
-                    ),
-                  }}
+          <ul className="space-y-2 max-h-40 overflow-auto">
+            {habit && habit?.progress.length > 0 ? (
+              habit?.progress.map((item, index) => (
+                <li
+                  key={index}
+                  className="py-2 border rounded-md border-gray-300 p-2 mt-2"
                 >
-                  <p className="text-gray-600">
-                    {item.count} {habit.habitGoal.unit}
-                  </p>
-                  <p className="text-black font-bold">
-                    {habit.habitGoal.count} {habit.habitGoal.unit}
-                  </p>
-                </div>
-              </li>
-            ))}
+                  <span className="font-medium text-gray-800">
+                    {new Date(item.date).toLocaleDateString("en-Us", {
+                      dateStyle: "medium",
+                    })}
+                  </span>
+                  <div
+                    className="flex items-center justify-between p-1 "
+                    style={{
+                      background: getBackgroundColor(
+                        item.count,
+                        habit.habitGoal.count
+                      ),
+                    }}
+                  >
+                    <p className="text-gray-600">
+                      {item.count} {habit.habitGoal.unit}
+                    </p>
+                    <p className="text-black font-bold">
+                      {habit.habitGoal.count} {habit.habitGoal.unit}
+                    </p>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p className="text-black text-sm">Oops! No Progress Yet.</p>
+            )}
           </ul>
         </div>
 
@@ -241,24 +292,27 @@ const HabitPage = () => {
           <h2 className="text-xl font-semibold text-gray-700">
             Today &apos;s Goal
           </h2>
-          <div
-            className={`${
-              getProgressPercentage(habit.progress).color
-            } p-2 rounded-lg mt-2 text-black shadow-md`}
-          >
-            <p className="text-sm">
-              You have completed{" "}
-              {getProgressPercentage(habit.progress).percentage}% Goal.{" "}
-            </p>
-            {getProgressPercentage(habit.progress).message}
-          </div>
+          {habit?.progress && (
+            <div
+              className={`${
+                getProgressPercentage(habit?.progress).color
+              } p-2 rounded-lg mt-2 text-black shadow-md`}
+            >
+              <p className="text-sm">
+                You have completed{" "}
+                {getProgressPercentage(habit?.progress).percentage.toFixed(2)}%
+                Goal.{" "}
+              </p>
+              {getProgressPercentage(habit.progress).message}
+            </div>
+          )}
         </div>
 
         {/* Habit Start Date */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-700">Start Date</h2>
           <p className="text-gray-600">
-            {new Date(habit.startDate).toLocaleDateString("en-Us", {
+            {new Date(habit?.startDate).toLocaleDateString("en-Us", {
               dateStyle: "medium",
             })}
           </p>
@@ -349,9 +403,10 @@ const HabitPage = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#318CE7] text-white py-2 rounded-md hover:bg-blue-600 transition"
+                className="w-full bg-[#318CE7] text-white py-2 rounded-md hover:bg-blue-600 transition disabled:bg-gray-400"
+                disabled={habitUpdating}
               >
-                Update Habit
+                {habitUpdating ? "Updating..." : "Update Habit"}
               </button>
             </form>
           </div>
@@ -411,12 +466,27 @@ const HabitPage = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#318CE7] text-white py-2 rounded-md hover:bg-blue-600 transition"
+                className="w-full bg-[#318CE7] text-white py-2 rounded-md hover:bg-blue-600 transition disabled:bg-gray-400"
+                disabled={progressUpdating}
               >
-                Add/Update Progress
+                {progressUpdating ? "Updating..." : "Add/Update Progress"}
               </button>
             </form>
           </div>
+        </div>
+      )}
+      {barData.length > 0 && (
+        <div className="max-w-4xl mx-auto h-96 mt-5">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={barData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
     </div>

@@ -20,7 +20,7 @@ const Signin = () => {
       if (response.data.success) {
         localStorage.setItem("authToken", JSON.stringify(response.data.token));
         navigate("/habit");
-        toast.success("Signin Successfull.");
+        toast.success("Signin Successful.");
       }
     } catch (error) {
       console.error("Error:", error);

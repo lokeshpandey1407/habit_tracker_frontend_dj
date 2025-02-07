@@ -9,6 +9,7 @@ const Habits = () => {
   const navigate = useNavigate();
   const [habits, setHabits] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [habitAdding, setHabitAdding] = useState(false);
   const [habitModal, setHabitModal] = useState(false);
 
   const getBackgroundColor = (progress, goal) => {
@@ -39,6 +40,7 @@ const Habits = () => {
   };
 
   async function handleCreateHabit(e) {
+    setHabitAdding(true);
     e.preventDefault();
     const token = JSON.parse(localStorage.getItem("authToken"));
     const formData = new FormData(e.target);
@@ -56,7 +58,7 @@ const Habits = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(response);
+
       if (response.data.success) {
         setHabits((prev) => [response?.data?.data, ...prev]);
         closeModal();
@@ -194,7 +196,7 @@ const Habits = () => {
             <form className="space-y-4" onSubmit={handleCreateHabit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Habit Title*
+                  Habit Name*
                 </label>
                 <input
                   type="text"
@@ -222,19 +224,7 @@ const Habits = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Goal Unit*
-                  </label>
-                  <input
-                    className="w-full border rounded-md p-2 focus:ring focus:ring-blue-300  bg-slate-300 text-gray-900"
-                    type="text"
-                    name="unit"
-                    placeholder="e.g. Minutes"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Goal Count*
+                    Goal*
                   </label>
                   <input
                     type="number"
@@ -242,6 +232,18 @@ const Habits = () => {
                     className="w-full border rounded-md p-2 focus:ring focus:ring-blue-300  bg-slate-300 text-gray-900"
                     placeholder="e.g. 10"
                     name="count"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Unit*
+                  </label>
+                  <input
+                    className="w-full border rounded-md p-2 focus:ring focus:ring-blue-300  bg-slate-300 text-gray-900"
+                    type="text"
+                    name="unit"
+                    placeholder="e.g. Minutes"
                     required
                   />
                 </div>
@@ -260,9 +262,10 @@ const Habits = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#318CE7] text-white py-2 rounded-md hover:bg-blue-600 transition"
+                className="w-full bg-[#318CE7] text-white py-2 rounded-md hover:bg-blue-600 transition disabled:bg-gray-400"
+                disabled={habitAdding}
               >
-                Add Habit
+                {habitAdding ? "Adding..." : "Add Habit"}
               </button>
             </form>
           </div>
