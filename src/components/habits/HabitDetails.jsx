@@ -282,7 +282,7 @@ const HabitPage = () => {
                 </li>
               ))
             ) : (
-              <p className="text-black text-sm">Oops! No Progress Yet.</p>
+              <p className="text-black text-sm dark:text-white">Oops! No Progress Yet.</p>
             )}
           </ul>
         </div>
@@ -296,7 +296,7 @@ const HabitPage = () => {
             <div
               className={`${
                 getProgressPercentage(habit?.progress).color
-              } p-2 rounded-lg mt-2 text-black shadow-md dark:text-white`}
+              } p-2 rounded-lg mt-2 text-black shadow-md`}
             >
               <p className="text-sm">
                 You have completed{" "}
