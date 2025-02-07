@@ -39,8 +39,8 @@ const Signup = () => {
 
   return (
     <div className="flex justify-center items-center min-h-[90vh] bg-gray-100 min-w-full">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-center text-gray-700">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg dark:bg-black">
+        <h2 className="text-2xl font-semibold text-center text-gray-700 dark:text-white">
           Sign Up
         </h2>
 

@@ -12,11 +12,6 @@ const Habits = () => {
   const [habitAdding, setHabitAdding] = useState(false);
   const [habitModal, setHabitModal] = useState(false);
 
-  const getBackgroundColor = (progress, goal) => {
-    const progressPercentage = (progress / goal) * 100;
-    return `linear-gradient(to right, #48BB78 ${progressPercentage}%, #E2E8F0 ${progressPercentage}%)`;
-  };
-
   const fetchHabit = async () => {
     setLoading(true);
     const token = JSON.parse(localStorage.getItem("authToken"));
@@ -124,15 +119,12 @@ const Habits = () => {
             habits.map((habit, index) => (
               <div
                 key={index}
-                className="flex flex-col p-2 rounded-lg border-black border-2 shadow-sm text-gray-800 w-full sm:w-full md:max-w-[400px] min-h-16"
-                style={{
-                  background: getBackgroundColor(habit.progress, habit.goal),
-                }}
+                className="flex flex-col p-2 rounded-lg border-black border-2 shadow-sm text-gray-800 w-full sm:w-full md:max-w-[400px] min-h-16 dark:border-2 dark:border-sky-400 dark:bg-black"
               >
                 <div className="flex-1">
-                  <h3 className="text-md font-medium">{habit.title}</h3>
+                  <h3 className="text-md font-medium dark:text-white">{habit.title}</h3>
                   <p className="text-xs text-gray-400">{habit.description}</p>
-                  <p className="text-black text-xs">
+                  <p className="text-black text-xs dark:text-white">
                     Current Goal: {habit?.habitGoal.count}{" "}
                     {habit?.habitGoal.unit}
                   </p>
@@ -162,7 +154,7 @@ const Habits = () => {
             ))
           ) : (
             <div className="flex justify-center items-center w-full">
-              <p className="text-black text-center">
+              <p className="text-black text-center dark:text-white">
                 Oops! Your habit list is feeling lonely. Give it some company!
               </p>
             </div>

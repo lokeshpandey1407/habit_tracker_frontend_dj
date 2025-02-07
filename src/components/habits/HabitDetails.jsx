@@ -170,7 +170,7 @@ const HabitPage = () => {
   }
 
   async function handleUpdateProgress(e) {
-    setProgressUpdateModal(true);
+    setProgressUpdating(true);
     e.preventDefault();
     const token = JSON.parse(localStorage.getItem("authToken"));
     const formData = new FormData(e.target);
@@ -197,7 +197,7 @@ const HabitPage = () => {
       toast.error("Unable to update habit progress");
       console.log(error);
     } finally {
-      setProgressUpdateModal(false);
+      setProgressUpdating(false);
     }
   }
 
@@ -211,15 +211,15 @@ const HabitPage = () => {
       >
         <Icon icon="ep:back" width="24" height="24" />
       </button>
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 dark:bg-black">
         {/* Habit Title and Description */}
         <div className="mb-4 flex flex-row justify-between items-center">
           <div>
-            <h1 className="text-xl font-semibold text-gray-800">
+            <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
               {habit?.title}
             </h1>
             {habit?.description && (
-              <p className="text-gray-600 text-md mt-2">
+              <p className="text-gray-600 text-md mt-2 dark:text-white">
                 {habit?.description || ""}
               </p>
             )}
@@ -234,8 +234,8 @@ const HabitPage = () => {
 
         {/* Habit Goal */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700">Goal</h2>
-          <p className="text-gray-600">
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Goal</h2>
+          <p className="text-gray-600 dark:text-white">
             {habit?.habitGoal?.count || ""} {habit?.habitGoal?.unit || ""}
           </p>
         </div>
@@ -243,7 +243,7 @@ const HabitPage = () => {
         {/* Progress Section */}
         <div className="mb-6 ">
           <div className="flex flex-row justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-700">Progress</h2>
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Progress</h2>
             <button
               className="bg-[#318CE7] hover:bg-blue-600 px-3 py-2 rounded-md"
               onClick={openProgressUpdaetModal}
@@ -258,7 +258,7 @@ const HabitPage = () => {
                   key={index}
                   className="py-2 border rounded-md border-gray-300 p-2 mt-2"
                 >
-                  <span className="font-medium text-gray-800">
+                  <span className="font-medium text-gray-800 dark:text-white">
                     {new Date(item.date).toLocaleDateString("en-Us", {
                       dateStyle: "medium",
                     })}
@@ -272,10 +272,10 @@ const HabitPage = () => {
                       ),
                     }}
                   >
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-white">
                       {item.count} {habit.habitGoal.unit}
                     </p>
-                    <p className="text-black font-bold">
+                    <p className="text-black font-bold dark:text-white">
                       {habit.habitGoal.count} {habit.habitGoal.unit}
                     </p>
                   </div>
@@ -289,14 +289,14 @@ const HabitPage = () => {
 
         {/* Today's Goal Completion */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700">
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-white">
             Today &apos;s Goal
           </h2>
           {habit?.progress && (
             <div
               className={`${
                 getProgressPercentage(habit?.progress).color
-              } p-2 rounded-lg mt-2 text-black shadow-md`}
+              } p-2 rounded-lg mt-2 text-black shadow-md dark:text-white`}
             >
               <p className="text-sm">
                 You have completed{" "}
@@ -310,8 +310,8 @@ const HabitPage = () => {
 
         {/* Habit Start Date */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700">Start Date</h2>
-          <p className="text-gray-600">
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Start Date</h2>
+          <p className="text-gray-600 dark:text-white">
             {new Date(habit?.startDate).toLocaleDateString("en-Us", {
               dateStyle: "medium",
             })}
