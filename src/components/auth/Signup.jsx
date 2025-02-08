@@ -1,12 +1,14 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const formData = new FormData(e.target);
     const name = formData.get("name");
@@ -28,6 +30,8 @@ const Signup = () => {
       toast.error(
         error?.response?.data?.message || "Signup failed. Please try again."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,9 +73,10 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full mt-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="w-full mt-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? "Signing Up" : "Sign Up"}
           </button>
         </form>
 
