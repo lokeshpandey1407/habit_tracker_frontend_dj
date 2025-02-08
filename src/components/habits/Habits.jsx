@@ -16,9 +16,12 @@ const Habits = () => {
     setLoading(true);
     const token = JSON.parse(localStorage.getItem("authToken"));
     try {
-      const response = await axios.get(`http://localhost:5000/api/habits`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/habits`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (response.data.success) {
         setHabits(response.data.data);
       }
@@ -47,7 +50,7 @@ const Habits = () => {
     habitObj.startDate = formData.get("startDate");
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/habits",
+        `${import.meta.env.VITE_API_BASE_URL}/habits`,
         habitObj,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -69,7 +72,7 @@ const Habits = () => {
     const token = JSON.parse(localStorage.getItem("authToken"));
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/habits/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/habits/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -122,7 +125,9 @@ const Habits = () => {
                 className="flex flex-col p-2 rounded-lg border-black border-2 shadow-sm text-gray-800 w-full sm:w-full md:max-w-[400px] min-h-16 dark:border-2 dark:border-sky-400 dark:bg-black"
               >
                 <div className="flex-1">
-                  <h3 className="text-md font-medium dark:text-white">{habit.title}</h3>
+                  <h3 className="text-md font-medium dark:text-white">
+                    {habit.title}
+                  </h3>
                   <p className="text-xs text-gray-400">{habit.description}</p>
                   <p className="text-black text-xs dark:text-white">
                     Current Goal: {habit?.habitGoal.count}{" "}

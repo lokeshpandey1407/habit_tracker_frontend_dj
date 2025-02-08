@@ -14,7 +14,7 @@ const Signin = () => {
     const userObj = { username, password };
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
         userObj
       );
       if (response.data.success) {

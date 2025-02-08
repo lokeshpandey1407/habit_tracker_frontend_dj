@@ -30,7 +30,7 @@ const HabitPage = () => {
     const token = JSON.parse(localStorage.getItem("authToken"));
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/habits/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/habits/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -149,7 +149,7 @@ const HabitPage = () => {
     habitObj.count = formData.get("count");
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/habits/${habit._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/habits/${habit._id}`,
         habitObj,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -179,7 +179,7 @@ const HabitPage = () => {
     progressObj.date = formData.get("date");
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/habits/${habit._id}/progress`,
+        `${import.meta.env.VITE_API_BASE_URL}/habits/${habit._id}/progress`,
         progressObj,
         {
           headers: { Authorization: `Bearer ${token}` },
